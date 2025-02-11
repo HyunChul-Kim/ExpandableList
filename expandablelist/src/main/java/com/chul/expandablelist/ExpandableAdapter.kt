@@ -64,14 +64,14 @@ abstract class ExpandableAdapter<T>(
     override fun onGroupClicked(position: Int) {
         val group = (data[position] as? ExpandableItemType.Group) ?: return
         if(group.item.isExpanded) {
-            collapseLowDepth(group.item)
+            collapseWithLowDepth(group.item)
         } else {
             expand(group.item)
         }
     }
 
     private fun expand(item: ExpandableItem<T>) {
-        collapseLowDepth(item)
+        collapseWithLowDepth(item)
         val expandPosition = data.indexOf(ExpandableItemType.Group(item))
         val insertPosition = expandPosition + 1
         item.isExpanded = true
@@ -91,7 +91,7 @@ abstract class ExpandableAdapter<T>(
         notifyItemChanged(position)
     }
 
-    private fun collapseLowDepth(item: ExpandableItem<T>) {
+    private fun collapseWithLowDepth(item: ExpandableItem<T>) {
         getSameDepthExpandedItem(item)?.let { sameDepthExpandedItem ->
             while(previouslyExpandedItems.isNotEmpty()) {
                 val previousItem = previouslyExpandedItems.pop()
