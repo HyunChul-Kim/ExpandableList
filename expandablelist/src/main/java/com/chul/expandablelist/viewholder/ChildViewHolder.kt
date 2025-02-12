@@ -3,8 +3,9 @@ package com.chul.expandablelist.viewholder
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.chul.expandablelist.listener.OnChildClickListener
+import com.chul.expandablelist.model.ChildItem
 
-open class ChildViewHolder(
+abstract class ChildViewHolder<T>(
     itemView: View
 ): ViewHolder(itemView) {
 
@@ -15,6 +16,8 @@ open class ChildViewHolder(
             onChildClickListener?.onChildClicked(bindingAdapterPosition)
         }
     }
+
+    abstract fun bind(item: ChildItem<T>)
 
     fun setOnChildClickListener(listener: OnChildClickListener) {
         this.onChildClickListener = listener

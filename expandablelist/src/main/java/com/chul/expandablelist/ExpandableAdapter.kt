@@ -13,12 +13,11 @@ import com.chul.expandablelist.viewholder.ChildViewHolder
 import com.chul.expandablelist.viewholder.GroupViewHolder
 import java.util.Stack
 
-abstract class ExpandableAdapter<T>(
-): Adapter<ViewHolder>(),
+abstract class ExpandableAdapter<T, GVH: GroupViewHolder<T>, CVH: ChildViewHolder<T>>:
+    Adapter<ViewHolder>(),
     OnGroupClickListener,
     OnChildClickListener
 {
-    private var expandedPosition = -1
     private var previouslyExpandedItems: Stack<ExpandableItem<T>> = Stack()
     private var previouslyCheckedItem: ChildItem<T>? = null
 
@@ -46,15 +45,16 @@ abstract class ExpandableAdapter<T>(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when(holder) {
-            is GroupViewHolder -> {
-                val item = (data[position] as ExpandableItemType.Group)
-                onBindGroupViewHolder(holder, item.item)
+            is GroupViewHolder<*> -> {
+                val item = (data[position] as ExpandableItemType.Group).item
+                (holder as GVH).bind(item)
             }
-            is ChildViewHolder -> {
-                val item = (data[position] as ExpandableItemType.Child)
-                onBindChildViewHolder(holder, item.item)
+            is ChildViewHolder<*> -> {
+                val item = (data[position] as ExpandableItemType.Child).item
+                (holder as CVH).bind(item)
             }
         }
     }
@@ -84,7 +84,7 @@ abstract class ExpandableAdapter<T>(
 
     private fun collapse(item: ExpandableItem<T>, position: Int) {
         val insertPosition = position + 1
-        val children = getAllChildren(item)
+        val children = item.children
         item.isExpanded = false
         data.removeAll(children)
         notifyItemRangeRemoved(insertPosition, children.size)
@@ -144,8 +144,14 @@ abstract class ExpandableAdapter<T>(
         if(item.isExpanded) {
             item.children.forEach { child ->
                 visibleChildren.add(child)
-                if(child is ExpandableItemType.Group) {
-                    visibleChildren.addAll(getVisibleChildren(child.item))
+                when(child) {
+                    is ExpandableItemType.Group -> {
+                        child.item.depth = item.depth + 1
+                        visibleChildren.addAll(getVisibleChildren(child.item))
+                    }
+                    is ExpandableItemType.Child -> {
+                        child.item.depth = item.depth + 1
+                    }
                 }
             }
         }
@@ -171,8 +177,8 @@ abstract class ExpandableAdapter<T>(
         return previouslyExpandedItems.find { getParent(it) == parent }
     }
 
-    abstract fun onCreateGroupViewHolder(parent: ViewGroup): GroupViewHolder
-    abstract fun onCreateChildViewHolder(parent: ViewGroup): ChildViewHolder
+    abstract fun onCreateGroupViewHolder(parent: ViewGroup): GVH
+    abstract fun onCreateChildViewHolder(parent: ViewGroup): CVH
     abstract fun onBindGroupViewHolder(holder: ViewHolder, item: ExpandableItem<T>)
     abstract fun onBindChildViewHolder(holder: ViewHolder, item: ChildItem<T>)
     abstract fun onBindGroupViewHolder(holder: ViewHolder, item: ExpandableItem<T>, payload: Payload)

@@ -6,7 +6,7 @@ data class ExpandableItem<T>(
     val title: String,
     val item: T,
     val children: List<ExpandableItemType<T>> = emptyList(),
-    val depth: Int = 0,
+    var depth: Int = 0,
     var isExpanded: Boolean = false,
     val id: String = UUID.randomUUID().toString()
 )
@@ -14,6 +14,7 @@ data class ExpandableItem<T>(
 data class ChildItem<T>(
     val title: String,
     val item: T,
+    var depth: Int = 0,
     var isSelected: Boolean = false,
     val id: String = UUID.randomUUID().toString()
 )
