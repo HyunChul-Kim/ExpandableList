@@ -2,19 +2,35 @@ package com.chul.expandablelist.viewholder
 
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.updatePadding
 import com.chul.expandablelist.R
-import com.chul.expandablelist.model.ExpandableItem
+import com.chul.expandablelist.databinding.ViewholderSampleGroupItemBinding
+import com.chul.expandablelist.model.Payload
 
 class SampleGroupViewHolder(
-    itemView: View,
+    private val binding: ViewholderSampleGroupItemBinding,
     private val padding: Int
-): GroupViewHolder<String>(itemView) {
+): GroupViewHolder<String>(binding.root) {
 
-    private val title = itemView.findViewById<AppCompatTextView>(R.id.group_title)
+    override fun bind(
+        item: String?,
+        isSelected: Boolean,
+        isExpanded: Boolean,
+        depth: Int,
+        hasChild: Boolean
+    ) {
+        binding.groupTitle.text = "$item, selected = $isSelected"
+        val depthPaddingStart = depth * padding
+        binding.groupTitle.updatePadding(left = depthPaddingStart)
+    }
 
-    override fun bind(item: ExpandableItem<String>) {
-        title.text = item.title
-        val depthPaddingStart = item.depth * padding
-        title.setPadding(depthPaddingStart, 0, 0, 0)
+    override fun update(item: String?, depth: Int, hasChild: Boolean, payload: Payload) {
+        if(payload is Payload.ChangedSelect) {
+            binding.groupTitle.text = "$item, selected = ${payload.isSelected}"
+        }
+    }
+
+    override fun onClicked(position: Int) {
+
     }
 }

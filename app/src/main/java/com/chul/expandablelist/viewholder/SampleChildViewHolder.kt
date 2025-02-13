@@ -2,19 +2,29 @@ package com.chul.expandablelist.viewholder
 
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.updatePadding
 import com.chul.expandablelist.R
-import com.chul.expandablelist.model.ChildItem
+import com.chul.expandablelist.databinding.ViewholderSampleChildItemBinding
+import com.chul.expandablelist.model.Payload
 
 class SampleChildViewHolder(
-    itemView: View,
+    private val binding: ViewholderSampleChildItemBinding,
     private val padding: Int
-): ChildViewHolder<String>(itemView) {
+): ChildViewHolder<String>(binding.root) {
 
-    private val title = itemView.findViewById<AppCompatTextView>(R.id.child_title)
+    override fun bind(item: String?, isSelected: Boolean, depth: Int) {
+        binding.childTitle.text = "$item selected = $isSelected"
+        val depthPaddingStart = depth * padding
+        binding.childTitle.updatePadding(left = depthPaddingStart)
+    }
 
-    override fun bind(item: ChildItem<String>) {
-        title.text = item.title
-        val depthPaddingStart = item.depth * padding
-        title.setPadding(depthPaddingStart, 0, 0, 0)
+    override fun update(item: String?, depth: Int, payload: Payload) {
+        if(payload is Payload.ChangedSelect) {
+            binding.childTitle.text = "$item selected = ${payload.isSelected}"
+        }
+    }
+
+    override fun onClicked(position: Int) {
+
     }
 }
