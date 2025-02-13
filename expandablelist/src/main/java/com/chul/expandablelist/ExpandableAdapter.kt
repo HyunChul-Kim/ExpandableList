@@ -58,11 +58,9 @@ abstract class ExpandableAdapter<T, GVH: GroupViewHolder<T>, CVH: ChildViewHolde
         return when(viewType) {
             VIEW_TYPE_GROUP -> onCreateGroupViewHolder(parent).apply {
                 setOnGroupClickListener(this@ExpandableAdapter)
-                //setOnClickListener(this@ExpandableAdapter)
             }
             VIEW_TYPE_CHILD -> onCreateChildViewHolder(parent).apply {
                 setOnChildClickListener(this@ExpandableAdapter)
-                //setOnClickListener(this@ExpandableAdapter)
             }
             else -> throw IllegalArgumentException("not valid view type")
         }
